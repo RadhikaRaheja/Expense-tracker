@@ -81,16 +81,17 @@
       try {
         const res = await fetch("https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Profit%20Sheet");
         profitSheetData = await res.json();
-        const uniqueMonths = profitSheetData.map(row => row.Month).filter(Boolean);
+        const uniqueMonths = [...new Set(profitSheetData.map(row => row.Month).filter(Boolean))];
+        const sortedMonths = uniqueMonths.sort((a, b) => new Date(`1 ${b}`) - new Date(`1 ${a}`));
         viewMonthYear.innerHTML = '';
         profitMonthYear.innerHTML = '';
-        uniqueMonths.forEach(month => {
+        sortedMonths.forEach(month => {
           const option = `<option value="${month}">${month}</option>`;
           viewMonthYear.innerHTML += option;
           profitMonthYear.innerHTML += option;
         });
-        viewMonthYear.value = uniqueMonths[0];
-        profitMonthYear.value = uniqueMonths[0];
+        viewMonthYear.value = sortedMonths[0];
+        profitMonthYear.value = sortedMonths[0];
       } catch (e) {
         console.error("Error loading profit sheet", e);
       }
