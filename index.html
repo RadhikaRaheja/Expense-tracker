@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Expenses Tracker 🎀</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background-color: #fff6f9;
+      padding: 1rem;
+    }
+    .tab-active {
+      background-color: #f9a8d4;
+      color: white;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-gray-800">
+  <div class="max-w-xl mx-auto">
+    <h1 class="text-2xl font-bold text-center mb-6">Daily Expenses Tracker 🎀</h1>
+
+    <div class="flex justify-around mb-4">
+      <button id="addTab" onclick="switchTab('add')" class="px-3 py-2 rounded bg-pink-200">Add</button>
+      <button id="viewTab" onclick="switchTab('view')" class="px-3 py-2 rounded bg-pink-200">View</button>
+      <button id="profitTab" onclick="switchTab('profit')" class="px-3 py-2 rounded bg-pink-200">Profit</button>
+    </div>
+
+    <!-- Add Section -->
+    <div id="addSection" class="mb-6">
+      <input type="date" id="datePicker" class="w-full mb-2 p-2 border rounded" />
+      <input type="number" id="amount" placeholder="Expense Amount" class="w-full mb-2 p-2 border rounded" />
+      <input type="text" id="note" placeholder="Comment / Note" class="w-full mb-2 p-2 border rounded" />
+      <button onclick="addExpense()" class="w-full bg-pink-500 text-white p-2 rounded">Save</button>
+    </div>
+
+    <!-- View Section -->
+    <div id="viewSection" class="hidden">
+      <select id="filter" onchange="renderExpenses()" class="mb-4 p-2 border rounded w-full">
+        <option value="month">This Month</option>
+      </select>
+      <div id="expensesList" class="space-y-2"></div>
+    </div>
+
+    <!-- Profit Section -->
+    <div id="profitSection" class="hidden">
+      <div id="profitDisplay" class="text-center text-xl font-semibold">Total Profit: ₹0.00</div>
+    </div>
+  </div>
+
+  <script>
+    const addTab = document.getElementById('addTab');
+    const viewTab = document.getElementById('viewTab');
+    const profitTab = document.getElementById('profitTab');
+    const addSection = document.getElementById('addSection');
+    const viewSection = document.getElementById('viewSection');
+    const profitSection = document.getElementById('profitSection');
+    const datePicker = document.getElementById('datePicker');
+    const amountInput = document.getElementById('amount');
+    const noteInput = document.getElementById('note');
+    const expensesList = document.getElementById('expensesList');
+    const filter = document.getElementById('filter');
+    const profitDisplay = document.getElementById('profitDisplay');
+
+    datePicker.valueAsDate = new Date();
+
+    function switchTab(tab) {
+      [addSection, viewSection, profitSection].forEach(section => section.classList.add('hidden'));
+      [addTab, viewTab, profitTab].forEach(btn => btn.classList.remove('tab-active'));
+
+      if (tab === 'add') {
+        addSection.classList.remove('hidden');
+        addTab.classList.add('tab-active');
+      } else if (tab === 'view') {
+        viewSection.classList.remove('hidden');
+        viewTab.classList.add('tab-active');
+        renderExpenses();
+      } else if (tab === 'profit') {
+        profitSection.classList.remove('hidden');
+        profitTab.classList.add('tab-active');
+        showProfit();
+      }
+    }
+
+    function loadExpenses() {
+      return JSON.parse(localStorage.getItem('expenses') || '[]');
+    }
+
+    function saveExpenses(expenses) {
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+    }
+
+    function addExpense() {
+      const date = datePicker.value;
+      const amount = parseFloat(amountInput.value);
+      const note = noteInput.value;
+      if (!date || !amount) return;
+      const expenses = loadExpenses();
+      expenses.unshift({ id: Date.now(), date, amount, note });
+      saveExpenses(expenses);
+      amountInput.value = "";
+      noteInput.value = "";
+      renderExpenses();
+    }
+
+    function renderExpenses() {
+      const expenses = loadExpenses();
+      const now = new Date();
+      const filtered = expenses.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return (
+          entryDate.getMonth() === now.getMonth() &&
+          entryDate.getFullYear() === now.getFullYear()
+        );
+      });
+
+      expensesList.innerHTML = "";
+      filtered.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = "p-2 border rounded flex justify-between items-center";
+        div.innerHTML = `
+          <div>
+            <input type="number" value="${entry.amount}" onchange="updateAmount(${entry.id}, this.value)" class="w-24 border rounded px-1" />
+            <input type="text" value="${entry.note}" onchange="updateNote(${entry.id}, this.value)" class="border rounded px-1" />
+            <input type="date" value="${entry.date}" onchange="updateDate(${entry.id}, this.value)" class="border rounded px-1" />
+          </div>
+          <button onclick="deleteExpense(${entry.id})" class="text-sm bg-red-400 text-white px-2 py-1 rounded">Delete</button>
+        `;
+        expensesList.appendChild(div);
+      });
+    }
+
+    function updateAmount(id, newAmount) {
+      const expenses = loadExpenses();
+      const index = expenses.findIndex(e => e.id === id);
+      expenses[index].amount = parseFloat(newAmount);
+      saveExpenses(expenses);
+    }
+
+    function updateNote(id, newNote) {
+      const expenses = loadExpenses();
+      const index = expenses.findIndex(e => e.id === id);
+      expenses[index].note = newNote;
+      saveExpenses(expenses);
+    }
+
+    function updateDate(id, newDate) {
+      const expenses = loadExpenses();
+      const index = expenses.findIndex(e => e.id === id);
+      expenses[index].date = newDate;
+      saveExpenses(expenses);
+    }
+
+    function deleteExpense(id) {
+      const expenses = loadExpenses().filter(e => e.id !== id);
+      saveExpenses(expenses);
+      renderExpenses();
+    }
+
+    function showProfit() {
+      const expenses = loadExpenses();
+      const now = new Date();
+      const monthlyTotal = expenses
+        .filter(e => {
+          const d = new Date(e.date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        })
+        .reduce((acc, curr) => acc + curr.amount, 0);
+
+      profitDisplay.textContent = `Total Profit: ₹${monthlyTotal.toFixed(2)}`;
+    }
+
+    switchTab('add');
+  </script>
+</body>
+</html>
