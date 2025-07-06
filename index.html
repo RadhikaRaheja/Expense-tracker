@@ -75,6 +75,27 @@
     const profitMonthYear = document.getElementById('profitMonthYear');
     const profitValue = document.getElementById('profitValue');
 
+    let profitSheetData = [];
+
+    async function fetchProfitSheetData() {
+      try {
+        const res = await fetch("https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Profit%20Sheet");
+        profitSheetData = await res.json();
+        const uniqueMonths = profitSheetData.map(row => row.Month).filter(Boolean);
+        viewMonthYear.innerHTML = '';
+        profitMonthYear.innerHTML = '';
+        uniqueMonths.forEach(month => {
+          const option = `<option value="${month}">${month}</option>`;
+          viewMonthYear.innerHTML += option;
+          profitMonthYear.innerHTML += option;
+        });
+        viewMonthYear.value = uniqueMonths[0];
+        profitMonthYear.value = uniqueMonths[0];
+      } catch (e) {
+        console.error("Error loading profit sheet", e);
+      }
+    }
+
     function switchTab(tab) {
       addSection.classList.add('hidden');
       viewSection.classList.add('hidden');
@@ -86,24 +107,8 @@
         renderExpenses();
       } else {
         profitSection.classList.remove('hidden');
-        fetchProfit();
+        renderProfit();
       }
-    }
-
-    function populateDropdowns() {
-      const year = new Date().getFullYear();
-      for (let y = year - 5; y <= year + 2; y++) {
-        for (let m = 0; m < 12; m++) {
-          const monthName = new Date(0, m).toLocaleString('default', { month: 'long' });
-          const optionValue = `${m}-${y}`;
-          const label = `${monthName} ${y}`;
-          viewMonthYear.innerHTML += `<option value="${optionValue}">${label}</option>`;
-          profitMonthYear.innerHTML += `<option value="${optionValue}">${label}</option>`;
-        }
-      }
-      const now = new Date();
-      viewMonthYear.value = `${now.getMonth()}-${now.getFullYear()}`;
-      profitMonthYear.value = `${now.getMonth()}-${now.getFullYear()}`;
     }
 
     function loadExpenses() {
@@ -127,10 +132,11 @@
     }
 
     function renderExpenses() {
-      const [month, year] = viewMonthYear.value.split('-').map(Number);
+      const selected = viewMonthYear.value;
       const expenses = loadExpenses().filter(e => {
         const d = new Date(e.date);
-        return d.getMonth() === month && d.getFullYear() === year;
+        const m = d.toLocaleString('default', { month: 'long' }) + ' ' + d.getFullYear();
+        return m === selected;
       });
       let total = 0;
       expensesList.innerHTML = "";
@@ -175,22 +181,14 @@
       renderExpenses();
     }
 
-    async function fetchProfit() {
-      const [month, year] = profitMonthYear.value.split('-').map(Number);
-      const monthName = new Date(0, month).toLocaleString('default', { month: 'long' });
-      const target = `${monthName} ${year}`;
-      try {
-        const res = await fetch("https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Profit%20Sheet");
-        const data = await res.json();
-        const match = data.find(r => r.Month === target);
-        profitValue.textContent = match ? match.Profit : "0.00";
-      } catch (e) {
-        profitValue.textContent = "Error fetching";
-      }
+    function renderProfit() {
+      const selected = profitMonthYear.value;
+      const match = profitSheetData.find(row => row.Month === selected);
+      profitValue.textContent = match ? parseFloat(match.Profit).toFixed(2) : "0.00";
     }
 
     datePicker.valueAsDate = new Date();
-    populateDropdowns();
+    fetchProfitSheetData();
     switchTab('add');
   </script>
 </body>
