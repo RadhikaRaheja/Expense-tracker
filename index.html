@@ -45,9 +45,8 @@
 
       <!-- View Section -->
       <div id="viewSection" class="hidden">
-        <div class="flex gap-2 mb-4">
-          <select id="viewMonth" class="w-1/2 p-2 border border-pink-300 rounded-xl"></select>
-          <select id="viewYear" class="w-1/2 p-2 border border-pink-300 rounded-xl"></select>
+        <div class="mb-4">
+          <select id="viewMonthYear" class="w-full p-2 border border-pink-300 rounded-xl"></select>
         </div>
         <div class="text-lg font-bold text-center mb-2">Total: ₹<span id="total">0.00</span></div>
         <div id="expensesList" class="max-h-64 overflow-y-auto space-y-3"></div>
@@ -55,9 +54,8 @@
 
       <!-- Profit Section -->
       <div id="profitSection" class="hidden">
-        <div class="flex gap-2 mb-4">
-          <select id="profitMonth" class="w-1/2 p-2 border border-pink-300 rounded-xl"></select>
-          <select id="profitYear" class="w-1/2 p-2 border border-pink-300 rounded-xl"></select>
+        <div class="mb-4">
+          <select id="profitMonthYear" class="w-full p-2 border border-pink-300 rounded-xl"></select>
         </div>
         <div class="text-xl font-semibold text-center">Profit: ₹<span id="profitValue">0.00</span></div>
       </div>
@@ -73,10 +71,8 @@
     const noteInput = document.getElementById('note');
     const expensesList = document.getElementById('expensesList');
     const totalDisplay = document.getElementById('total');
-    const viewMonth = document.getElementById('viewMonth');
-    const viewYear = document.getElementById('viewYear');
-    const profitMonth = document.getElementById('profitMonth');
-    const profitYear = document.getElementById('profitYear');
+    const viewMonthYear = document.getElementById('viewMonthYear');
+    const profitMonthYear = document.getElementById('profitMonthYear');
     const profitValue = document.getElementById('profitValue');
 
     function switchTab(tab) {
@@ -95,20 +91,19 @@
     }
 
     function populateDropdowns() {
-      for (let i = 0; i < 12; i++) {
-        const monthName = new Date(0, i).toLocaleString('default', { month: 'long' });
-        viewMonth.innerHTML += `<option value="${i}">${monthName}</option>`;
-        profitMonth.innerHTML += `<option value="${i}">${monthName}</option>`;
-      }
       const year = new Date().getFullYear();
       for (let y = year - 5; y <= year + 2; y++) {
-        viewYear.innerHTML += `<option value="${y}">${y}</option>`;
-        profitYear.innerHTML += `<option value="${y}">${y}</option>`;
+        for (let m = 0; m < 12; m++) {
+          const monthName = new Date(0, m).toLocaleString('default', { month: 'long' });
+          const optionValue = `${m}-${y}`;
+          const label = `${monthName} ${y}`;
+          viewMonthYear.innerHTML += `<option value="${optionValue}">${label}</option>`;
+          profitMonthYear.innerHTML += `<option value="${optionValue}">${label}</option>`;
+        }
       }
-      viewMonth.value = new Date().getMonth();
-      viewYear.value = year;
-      profitMonth.value = new Date().getMonth();
-      profitYear.value = year;
+      const now = new Date();
+      viewMonthYear.value = `${now.getMonth()}-${now.getFullYear()}`;
+      profitMonthYear.value = `${now.getMonth()}-${now.getFullYear()}`;
     }
 
     function loadExpenses() {
@@ -132,8 +127,7 @@
     }
 
     function renderExpenses() {
-      const month = parseInt(viewMonth.value);
-      const year = parseInt(viewYear.value);
+      const [month, year] = viewMonthYear.value.split('-').map(Number);
       const expenses = loadExpenses().filter(e => {
         const d = new Date(e.date);
         return d.getMonth() === month && d.getFullYear() === year;
@@ -182,8 +176,7 @@
     }
 
     async function fetchProfit() {
-      const month = parseInt(profitMonth.value);
-      const year = profitYear.value;
+      const [month, year] = profitMonthYear.value.split('-').map(Number);
       const monthName = new Date(0, month).toLocaleString('default', { month: 'long' });
       const target = `${monthName} ${year}`;
       try {
