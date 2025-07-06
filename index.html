@@ -1,119 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daily Expenses Tracker 🎀</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="theme-color" content="#f8bbd0">
   <style>
     body {
-      font-family: 'Nunito', sans-serif;
-      background: url('https://img.freepik.com/free-vector/hand-painted-watercolor-floral-frame_23-2148948917.jpg?t=st=1712843955~exp=1712847555~hmac=5f4d6c9ea5e80aa8fa8b6c05a36c8eeb81908ff49f342b2ad6c3a29f647efbf1&w=826') no-repeat center center fixed;
+      background: url('https://i.pinimg.com/736x/58/09/12/5809128d95aee17fdad43073ef5495be.jpg') no-repeat center center fixed;
       background-size: cover;
+      font-family: 'Nunito', sans-serif;
       padding: 1rem;
     }
-    .panel {
+    .glass {
       background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      border-radius: 1rem;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      padding: 1.5rem;
+      backdrop-filter: blur(14px);
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     .tab-active {
-      background-color: #f9a8d4;
-      color: white;
+      color: #1e3a8a;
     }
   </style>
 </head>
-<body class="min-h-screen text-gray-800">
-  <div class="max-w-xl mx-auto panel">
-    <h1 class="text-2xl font-bold text-center mb-6">Daily Expenses Tracker 🎀</h1>
-
-    <div class="flex justify-around mb-4">
-      <button id="addTab" onclick="switchTab('add')" class="px-3 py-2 rounded bg-pink-200">Add</button>
-      <button id="viewTab" onclick="switchTab('view')" class="px-3 py-2 rounded bg-pink-200">View</button>
-      <button id="profitTab" onclick="switchTab('profit')" class="px-3 py-2 rounded bg-pink-200">Profit</button>
-    </div>
-
-    <!-- Add Section -->
-    <div id="addSection">
-      <input type="date" id="datePicker" class="w-full mb-2 p-2 border rounded" />
-      <input type="number" id="amount" placeholder="Expense Amount" class="w-full mb-2 p-2 border rounded" />
-      <input type="text" id="note" placeholder="Comment / Note" class="w-full mb-2 p-2 border rounded" />
-      <button onclick="addExpense()" class="w-full bg-pink-500 text-white p-2 rounded">Save</button>
-    </div>
-
-    <!-- View Section -->
-    <div id="viewSection" class="hidden">
-      <div class="flex mb-4 gap-2">
-        <select id="monthSelect" class="w-1/2 p-2 border rounded">
-          ${[...Array(12)].map((_, i) => `<option value="${i}">${new Date(0, i).toLocaleString('default', { month: 'long' })}</option>`).join('')}
-        </select>
-        <select id="yearSelect" class="w-1/2 p-2 border rounded"></select>
+<body class="min-h-screen text-purple-900 flex justify-center">
+  <div class="w-full max-w-xl">
+    <div class="glass p-6">
+      <h1 class="text-3xl font-bold text-center mb-6">Daily Expenses Tracker 🎀</h1>
+      <div class="flex gap-2 justify-center mb-6">
+        <button id="addTab" class="px-4 py-2 rounded-full bg-white text-purple-700 border border-purple-300" onclick="switchTab('add')">➕ Add</button>
+        <button id="viewTab" class="px-4 py-2 rounded-full bg-white text-purple-700 border border-purple-300" onclick="switchTab('view')">📖 View</button>
+        <button id="profitTab" class="px-4 py-2 rounded-full bg-white text-purple-700 border border-purple-300" onclick="switchTab('profit')">📊 Profit</button>
       </div>
-      <div class="text-center font-semibold mb-2">Total: ₹<span id="total">0.00</span></div>
-      <div id="expensesList" class="space-y-2"></div>
-    </div>
 
-    <!-- Profit Section -->
-    <div id="profitSection" class="hidden">
-      <div class="flex mb-4 gap-2">
-        <select id="profitMonth" class="w-1/2 p-2 border rounded">
-          ${[...Array(12)].map((_, i) => `<option value="${i}">${new Date(0, i).toLocaleString('default', { month: 'long' })}</option>`).join('')}
-        </select>
-        <select id="profitYear" class="w-1/2 p-2 border rounded"></select>
+      <!-- Add Section -->
+      <div id="addSection" class="mb-6">
+        <input type="date" id="datePicker" class="w-full p-2 mb-2 rounded-xl border border-pink-300" />
+        <input type="number" id="amount" placeholder="Expense Amount" class="w-full p-2 mb-2 rounded-xl border border-pink-300" />
+        <input type="text" id="note" placeholder="Comment / Note" class="w-full p-2 mb-2 rounded-xl border border-pink-300" />
+        <button onclick="addExpense()" class="w-full bg-pink-400 hover:bg-pink-500 text-white p-2 rounded-xl">Add Expense</button>
       </div>
-      <div class="text-center text-xl font-semibold">Profit: ₹<span id="profitValue">0.00</span></div>
+
+      <!-- View Section -->
+      <div id="viewSection" class="hidden">
+        <div class="flex gap-2 mb-4">
+          <select id="viewMonth" class="w-1/2 p-2 border border-pink-300 rounded-xl"></select>
+          <select id="viewYear" class="w-1/2 p-2 border border-pink-300 rounded-xl"></select>
+        </div>
+        <div class="text-lg font-bold text-center mb-2">Total: ₹<span id="total">0.00</span></div>
+        <div id="expensesList" class="max-h-64 overflow-y-auto space-y-3"></div>
+      </div>
+
+      <!-- Profit Section -->
+      <div id="profitSection" class="hidden">
+        <div class="flex gap-2 mb-4">
+          <select id="profitMonth" class="w-1/2 p-2 border border-pink-300 rounded-xl"></select>
+          <select id="profitYear" class="w-1/2 p-2 border border-pink-300 rounded-xl"></select>
+        </div>
+        <div class="text-xl font-semibold text-center">Profit: ₹<span id="profitValue">0.00</span></div>
+      </div>
     </div>
   </div>
 
   <script>
-    const now = new Date();
     const addSection = document.getElementById('addSection');
     const viewSection = document.getElementById('viewSection');
     const profitSection = document.getElementById('profitSection');
-    const addTab = document.getElementById('addTab');
-    const viewTab = document.getElementById('viewTab');
-    const profitTab = document.getElementById('profitTab');
     const datePicker = document.getElementById('datePicker');
     const amountInput = document.getElementById('amount');
     const noteInput = document.getElementById('note');
     const expensesList = document.getElementById('expensesList');
     const totalDisplay = document.getElementById('total');
-    const profitValue = document.getElementById('profitValue');
-    const monthSelect = document.getElementById('monthSelect');
-    const yearSelect = document.getElementById('yearSelect');
+    const viewMonth = document.getElementById('viewMonth');
+    const viewYear = document.getElementById('viewYear');
     const profitMonth = document.getElementById('profitMonth');
     const profitYear = document.getElementById('profitYear');
+    const profitValue = document.getElementById('profitValue');
 
     function switchTab(tab) {
-      [addSection, viewSection, profitSection].forEach(el => el.classList.add('hidden'));
-      [addTab, viewTab, profitTab].forEach(el => el.classList.remove('tab-active'));
+      addSection.classList.add('hidden');
+      viewSection.classList.add('hidden');
+      profitSection.classList.add('hidden');
 
-      if (tab === 'add') {
-        addSection.classList.remove('hidden');
-        addTab.classList.add('tab-active');
-      } else if (tab === 'view') {
+      if (tab === 'add') addSection.classList.remove('hidden');
+      else if (tab === 'view') {
         viewSection.classList.remove('hidden');
-        viewTab.classList.add('tab-active');
         renderExpenses();
       } else {
         profitSection.classList.remove('hidden');
-        profitTab.classList.add('tab-active');
         fetchProfit();
       }
     }
 
-    function populateYears() {
-      const start = 2022;
-      const current = new Date().getFullYear();
-      for (let y = start; y <= current + 1; y++) {
-        yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+    function populateDropdowns() {
+      for (let i = 0; i < 12; i++) {
+        const monthName = new Date(0, i).toLocaleString('default', { month: 'long' });
+        viewMonth.innerHTML += `<option value="${i}">${monthName}</option>`;
+        profitMonth.innerHTML += `<option value="${i}">${monthName}</option>`;
+      }
+      const year = new Date().getFullYear();
+      for (let y = year - 5; y <= year + 2; y++) {
+        viewYear.innerHTML += `<option value="${y}">${y}</option>`;
         profitYear.innerHTML += `<option value="${y}">${y}</option>`;
       }
-      yearSelect.value = now.getFullYear();
-      profitYear.value = now.getFullYear();
+      viewMonth.value = new Date().getMonth();
+      viewYear.value = year;
+      profitMonth.value = new Date().getMonth();
+      profitYear.value = year;
+    }
+
+    function loadExpenses() {
+      return JSON.parse(localStorage.getItem('expenses') || '[]');
+    }
+
+    function saveExpenses(data) {
+      localStorage.setItem('expenses', JSON.stringify(data));
     }
 
     function addExpense() {
@@ -121,35 +124,33 @@
       const amount = parseFloat(amountInput.value);
       const note = noteInput.value;
       if (!date || !amount) return;
-      const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+      const expenses = loadExpenses();
       expenses.unshift({ id: Date.now(), date, amount, note });
-      localStorage.setItem('expenses', JSON.stringify(expenses));
+      saveExpenses(expenses);
       amountInput.value = "";
       noteInput.value = "";
-      renderExpenses();
     }
 
     function renderExpenses() {
-      const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      const month = parseInt(monthSelect.value);
-      const year = parseInt(yearSelect.value);
-      const filtered = expenses.filter(e => {
+      const month = parseInt(viewMonth.value);
+      const year = parseInt(viewYear.value);
+      const expenses = loadExpenses().filter(e => {
         const d = new Date(e.date);
         return d.getMonth() === month && d.getFullYear() === year;
       });
       let total = 0;
       expensesList.innerHTML = "";
-      filtered.forEach(entry => {
-        total += entry.amount;
+      expenses.forEach(e => {
+        total += e.amount;
         const div = document.createElement('div');
-        div.className = "p-2 border rounded flex justify-between items-center";
+        div.className = "bg-pink-100 p-3 rounded shadow flex justify-between items-start";
         div.innerHTML = `
           <div class="w-full">
-            <input type="number" value="${entry.amount}" onchange="updateAmount(${entry.id}, this.value)" class="w-24 border rounded px-1" />
-            <input type="text" value="${entry.note}" onchange="updateNote(${entry.id}, this.value)" class="border rounded px-1" />
-            <input type="date" value="${entry.date}" onchange="updateDate(${entry.id}, this.value)" class="border rounded px-1" />
+            <input type="number" value="${e.amount}" onchange="updateAmount(${e.id}, this.value)" class="w-24 border rounded px-1" />
+            <input type="text" value="${e.note}" onchange="updateNote(${e.id}, this.value)" class="border rounded px-1" />
+            <input type="date" value="${e.date}" onchange="updateDate(${e.id}, this.value)" class="border rounded px-1" />
           </div>
-          <button onclick="deleteExpense(${entry.id})" class="text-sm bg-red-400 text-white px-2 py-1 rounded">Delete</button>
+          <button onclick="deleteExpense(${e.id})" class="text-sm bg-red-400 text-white px-2 py-1 rounded">Delete</button>
         `;
         expensesList.appendChild(div);
       });
@@ -157,27 +158,26 @@
     }
 
     function updateAmount(id, val) {
-      const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      const idx = expenses.findIndex(e => e.id === id);
-      expenses[idx].amount = parseFloat(val);
-      localStorage.setItem('expenses', JSON.stringify(expenses));
+      const data = loadExpenses();
+      const idx = data.findIndex(e => e.id === id);
+      data[idx].amount = parseFloat(val);
+      saveExpenses(data);
     }
     function updateNote(id, val) {
-      const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      const idx = expenses.findIndex(e => e.id === id);
-      expenses[idx].note = val;
-      localStorage.setItem('expenses', JSON.stringify(expenses));
+      const data = loadExpenses();
+      const idx = data.findIndex(e => e.id === id);
+      data[idx].note = val;
+      saveExpenses(data);
     }
     function updateDate(id, val) {
-      const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      const idx = expenses.findIndex(e => e.id === id);
-      expenses[idx].date = val;
-      localStorage.setItem('expenses', JSON.stringify(expenses));
+      const data = loadExpenses();
+      const idx = data.findIndex(e => e.id === id);
+      data[idx].date = val;
+      saveExpenses(data);
     }
     function deleteExpense(id) {
-      let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      expenses = expenses.filter(e => e.id !== id);
-      localStorage.setItem('expenses', JSON.stringify(expenses));
+      const data = loadExpenses().filter(e => e.id !== id);
+      saveExpenses(data);
       renderExpenses();
     }
 
@@ -186,21 +186,18 @@
       const year = profitYear.value;
       const monthName = new Date(0, month).toLocaleString('default', { month: 'long' });
       const target = `${monthName} ${year}`;
-
       try {
         const res = await fetch("https://opensheet.elk.sh/1UMul8nt25GR8MUM-_EdwAR0q6Ne2ovPv_R-m1-CHeXw/Profit%20Sheet");
         const data = await res.json();
-        const entry = data.find(r => r.Month === target);
-        profitValue.textContent = entry ? entry.Profit : "0.00";
+        const match = data.find(r => r.Month === target);
+        profitValue.textContent = match ? match.Profit : "0.00";
       } catch (e) {
         profitValue.textContent = "Error fetching";
       }
     }
 
-    datePicker.valueAsDate = now;
-    monthSelect.value = now.getMonth();
-    profitMonth.value = now.getMonth();
-    populateYears();
+    datePicker.valueAsDate = new Date();
+    populateDropdowns();
     switchTab('add');
   </script>
 </body>
